@@ -134,8 +134,8 @@ class _GeneratedStoryScreenState extends State<GeneratedStoryScreen> {
                   label: Text(isPlaying ? 'Stop' : 'Play'),
                   onPressed: _speak,
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.pinkAccent[400],
-                    onPrimary: Colors.white,
+                    backgroundColor: Colors.green,  // Previously 'primary'
+                    foregroundColor: Colors.white,  // Previously 'onPrimary'
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

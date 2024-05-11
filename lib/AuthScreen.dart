@@ -44,8 +44,8 @@ class AuthScreen extends StatelessWidget {
                 label: Text("Biometric Authentication", style: TextStyle(fontSize: 16)),
                 onPressed: () => _authenticate(context, 'biometric'),
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.indigo,
-                  onPrimary: Colors.white,
+                  backgroundColor: Colors.indigo,  // Previously 'primary'
+                  foregroundColor: Colors.white,  // Previously 'onPrimary'
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -61,8 +61,8 @@ class AuthScreen extends StatelessWidget {
                 label: Text("Password Authentication", style: TextStyle(fontSize: 16)),
                 onPressed: () => _authenticate(context, 'password'),
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.teal,
-                  onPrimary: Colors.white,
+                  backgroundColor: Colors.indigo,  // Previously 'primary'
+                  foregroundColor: Colors.white,  // Previously 'onPrimary'
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),

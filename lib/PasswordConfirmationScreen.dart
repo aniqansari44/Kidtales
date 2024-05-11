@@ -49,8 +49,8 @@ class _PasswordConfirmationScreenState extends State<PasswordConfirmationScreen>
               onPressed: _checkPassword,
               child: Text('Confirm'),
               style: ElevatedButton.styleFrom(
-                primary: Colors.blue, // Button color
-                onPrimary: Colors.white, // Text color
+                backgroundColor: Colors.blue,  // Previously 'primary'
+                foregroundColor: Colors.white,  // Previously 'onPrimary' // Text color
               ),
             ),
           ],

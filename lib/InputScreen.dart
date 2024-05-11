@@ -5,6 +5,7 @@ import 'dart:math';
 import 'GeneratedStoryScreen.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class InputScreen extends StatefulWidget {
   @override
@@ -65,7 +66,7 @@ class _InputScreenState extends State<InputScreen> {
 
   Future<void> _generateContent() async {
     setState(() => _isLoading = true);
-    final String apiKey = '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';
+    final String apiKey = dotenv.get('API_KEY');  // Get API key from .env
     final Uri textUri = Uri.parse('https://api.openai.com/v1/completions');
     final Uri imageUri = Uri.parse('https://api.openai.com/v1/images/generations');
 
@@ -114,7 +115,7 @@ class _InputScreenState extends State<InputScreen> {
               'Authorization': 'Bearer $apiKey',
             },
             body: jsonEncode({
-              'model': 'dall-e-2',  // Use DALL-E 2 for image generation
+              'model': 'dall-e-3',  // Use DALL-E 3 for image generation
               'prompt': "generate an animated-style image for " + _storyPromptController.text + " and do not include any text in the pictures they should be clear ",
               'n': 1,
               'size': '1024x1024'
@@ -223,8 +224,8 @@ class _InputScreenState extends State<InputScreen> {
                 style: TextStyle(fontSize: 18),
               ),
               style: ElevatedButton.styleFrom(
-                primary: Colors.deepPurple,
-                onPrimary: Colors.white,
+                backgroundColor: Colors.deepPurple,  // Previously 'primary'
+                foregroundColor: Colors.white,  // Previously 'onPrimary'
                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
