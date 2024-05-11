@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'HomePage.dart';  // Adjust the path as necessary
-import 'login_page.dart';  // Adjust the path as necessary
-import 'signup_page.dart';  // Adjust the path as necessary
+import 'HomePage.dart'; // Make sure the path to this file is correct
+import 'login_page.dart'; // Ensure the path to this file is correct
+import 'signup_page.dart'; // Ensure the path to this file is correct
 import 'SettingsScreen.dart';
 import 'SetupPasswordScreen.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env"); // Load environment variables
-  await Firebase.initializeApp(); // Initialize Firebase
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 

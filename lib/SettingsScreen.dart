@@ -93,8 +93,8 @@ class SettingsScreen extends StatelessWidget {
             // Handle sign out logic here
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,  // Previously 'primary'
-            foregroundColor: Colors.white,  // Previously 'onPrimary'
+            primary: Colors.red,
+            onPrimary: Colors.white,
           ),
         ),
       ),

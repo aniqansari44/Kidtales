@@ -81,8 +81,8 @@ class _BiometricConfirmationScreenState extends State<BiometricConfirmationScree
               label: Text(_isAuthenticating ? 'Authenticating...' : 'Authenticate'),
               onPressed: _isAuthenticating ? null : _authenticate,
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primaryColor,  // Changed from 'primary'
-                foregroundColor: Colors.white,  // Changed from 'onPrimary'
+                primary: theme.primaryColor,
+                onPrimary: Colors.white,
                 textStyle: TextStyle(fontSize: 18),
                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 20),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),

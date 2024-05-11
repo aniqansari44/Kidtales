@@ -117,8 +117,8 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
               ElevatedButton(
                 child: Text('Update Password'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,  // Previously 'primary'
-                  foregroundColor: Colors.white,  // Previously 'onPrimary
+                  primary: Colors.green,
+                  onPrimary: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 12),
                   textStyle: TextStyle(fontSize: 18),
                 ),
