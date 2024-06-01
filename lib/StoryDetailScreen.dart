@@ -89,8 +89,8 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
                     label: Text(isPlaying ? 'Stop' : 'Play'),
                     onPressed: _speak,
                     style: ElevatedButton.styleFrom(
-                      primary: isPlaying ? Colors.redAccent : theme.primaryColor,
-                      onPrimary: Colors.black,
+                      backgroundColor: isPlaying ? Colors.redAccent : theme.primaryColor,  // Changed from 'primary'
+                      foregroundColor: Colors.black,  // Changed from 'onPrimary'
                       textStyle: TextStyle(fontWeight: FontWeight.bold),
                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),
@@ -100,8 +100,8 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
                     label: Text('Pause'),
                     onPressed: isPlaying ? _pause : null,
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.orange,
-                      onPrimary: Colors.white,
+                      backgroundColor: Colors.orange,  // Changed from 'primary'
+                      foregroundColor: Colors.white,  // Changed from 'onPrimary'
                       textStyle: TextStyle(fontWeight: FontWeight.bold),
                       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),

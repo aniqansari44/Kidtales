@@ -14,6 +14,8 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
   String _customKeywords = '';
   double _dailyTimeLimit = 1.0;
   double _difficultyLevel = 1.0;
+  List<String> _searchHistory = [];
+  List<bool> _selectedHistory = [];
   final List<String> _genres = ['Adventure', 'Folk Tale', 'Fiction', 'Educational', 'Mystery'];
   final List<String> _languages = ['English', 'Urdu', 'French'];
 
@@ -21,6 +23,7 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
   void initState() {
     super.initState();
     _loadSettings();
+    _loadSearchHistory();
   }
 
   Future<void> _loadSettings() async {
@@ -36,6 +39,14 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
     });
   }
 
+  Future<void> _loadSearchHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _searchHistory = prefs.getStringList('searchHistory') ?? [];
+      _selectedHistory = List<bool>.filled(_searchHistory.length, false);
+    });
+  }
+
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('ageRestriction', _ageRestriction);
@@ -48,6 +59,22 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Settings saved successfully!')));
   }
 
+  Future<void> _deleteSelectedHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> updatedHistory = [];
+    for (int i = 0; i < _searchHistory.length; i++) {
+      if (!_selectedHistory[i]) {
+        updatedHistory.add(_searchHistory[i]);
+      }
+    }
+    setState(() {
+      _searchHistory = updatedHistory;
+      _selectedHistory = List<bool>.filled(_searchHistory.length, false);
+    });
+    await prefs.setStringList('searchHistory', updatedHistory);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Selected history items deleted successfully!')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,6 +84,10 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
           IconButton(
             icon: Icon(Icons.save),
             onPressed: _saveSettings,
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: _deleteSelectedHistory,
           ),
         ],
       ),
@@ -154,6 +185,23 @@ class _ParentalControlScreenState extends State<ParentalControlScreen> {
               onChanged: (value) {
                 setState(() => _difficultyLevel = value);
               },
+            ),
+            SizedBox(height: 20),
+            Text('Search History', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            _searchHistory.isEmpty
+                ? Text('No search history available.')
+                : Column(
+              children: List.generate(_searchHistory.length, (index) {
+                return CheckboxListTile(
+                  title: Text(_searchHistory[index]),
+                  value: _selectedHistory[index],
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _selectedHistory[index] = value!;
+                    });
+                  },
+                );
+              }),
             ),
           ],
         ),

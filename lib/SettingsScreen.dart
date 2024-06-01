@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'AuthScreen.dart'; // Auth screen for initial security checks
 import 'BiometricAuthScreen.dart';
 import 'SetupPasswordScreen.dart';
 import 'FeedbackScreen.dart';
+import 'login_page.dart'; // Import your login page
 
 class SettingsScreen extends StatelessWidget {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
       ),
-
       body: ListView(
         children: ListTile.divideTiles(
           context: context,
@@ -89,12 +92,16 @@ class SettingsScreen extends StatelessWidget {
         padding: EdgeInsets.all(16),
         child: ElevatedButton(
           child: Text('Sign Out'),
-          onPressed: () {
-            // Handle sign out logic here
+          onPressed: () async {
+            await _auth.signOut();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage(onLoginSuccess: () => Navigator.of(context).pushReplacementNamed('/home'))),
+            );
           },
           style: ElevatedButton.styleFrom(
-            primary: Colors.red,
-            onPrimary: Colors.white,
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
           ),
         ),
       ),

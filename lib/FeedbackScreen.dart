@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FeedbackScreen extends StatefulWidget {
   @override
@@ -10,62 +10,46 @@ class FeedbackScreen extends StatefulWidget {
 class _FeedbackScreenState extends State<FeedbackScreen> {
   final TextEditingController _feedbackController = TextEditingController();
 
-  Future<void> _sendEmail() async {
-    final Email email = Email(
-      body: _feedbackController.text,
-      subject: 'Feedback from KidTales App User',
-      recipients: ['kidtales44@gmail.com'],
-    );
+  Future<void> _submitFeedback() async {
+    if (_feedbackController.text.isEmpty) return;
 
-    try {
-      await FlutterEmailSender.send(email);
-    } on PlatformException catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Could not send email: ${error.toString()}'),
-        ),
-      );
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await FirebaseFirestore.instance.collection('feedback').add({
+        'userId': user.uid,
+        'feedback': _feedbackController.text,
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      _feedbackController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Feedback submitted!')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('You need to log in to submit feedback')));
     }
-  }
-
-  @override
-  void dispose() {
-    _feedbackController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Send Feedback'),
+        title: Text('Submit Feedback'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(
-              'Please enter your feedback below:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
+          children: [
             TextField(
               controller: _feedbackController,
               maxLines: 5,
               decoration: InputDecoration(
-                hintText: 'Enter your feedback here...',
+                hintText: 'Enter your feedback',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _sendEmail,
-              child: Text('Send Feedback'),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
-                onPrimary: Colors.white,
-              ),
+              onPressed: _submitFeedback,
+              child: Text('Submit'),
             ),
           ],
         ),

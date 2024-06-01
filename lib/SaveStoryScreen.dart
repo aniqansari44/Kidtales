@@ -49,7 +49,7 @@ class _SaveStoryScreenState extends State<SaveStoryScreen> {
                 separatorBuilder: (context, index) => Divider(color: Colors.grey[300]),
                 itemBuilder: (context, index) {
                   var story = snapshot.data![index];
-                  List<String> imagesURLs = story['imagePaths'].split(',');
+                  List<String> imagePaths = story['imagePaths'].split(',');
                   return ListTile(
                     leading: Icon(Icons.book, color: Colors.deepPurple), // Visually distinct icon
                     title: Text(story['title'], style: TextStyle(fontWeight: FontWeight.bold)),
@@ -65,7 +65,7 @@ class _SaveStoryScreenState extends State<SaveStoryScreen> {
                           builder: (context) => GeneratedStoryScreen(
                             initialStoryText: story['storyText'],
                             initialChoices: [], // assuming choices are not needed for now
-                            imagesURLs: imagesURLs,
+                            imagePaths: imagePaths, // Pass local paths instead of URLs
                             storyTitle: story['title'],
                           ),
                         ),

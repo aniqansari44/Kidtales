@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'GeneratedStoryScreen.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
+import 'package:uuid/uuid.dart';
 
 class InputScreen extends StatefulWidget {
   @override
@@ -20,7 +25,8 @@ class _InputScreenState extends State<InputScreen> {
   String _selectedLanguage = 'English';
   List<String> _availableLanguages = ['English', 'Urdu', 'French'];
   bool _isLoading = false;
-  List<String> _imagesURLs = []; // To store URLs of generated images
+  List<String> _imagesPaths = []; // To store local paths of generated images
+  List<String> _restrictedWords = ['Kiss', 'Romance', 'Sex']; // Add your restricted words here
 
   @override
   void initState() {
@@ -63,9 +69,34 @@ class _InputScreenState extends State<InputScreen> {
     super.dispose();
   }
 
+  Future<void> _saveSearchHistory(String searchText) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> searchHistory = prefs.getStringList('searchHistory') ?? [];
+    searchHistory.add(searchText);
+    await prefs.setStringList('searchHistory', searchHistory);
+  }
+
+  bool _containsRestrictedWords(String input) {
+    for (String word in _restrictedWords) {
+      if (input.toLowerCase().contains(word.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   Future<void> _generateContent() async {
+    final String storyPrompt = _storyPromptController.text;
+
+    if (_containsRestrictedWords(storyPrompt)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Your input contains restricted words. Please modify your input and try again.')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
-    final String apiKey = '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';
+    final String apiKey = dotenv.get('API_KEY');  // Get API key from .env
     final Uri textUri = Uri.parse('https://api.openai.com/v1/completions');
     final Uri imageUri = Uri.parse('https://api.openai.com/v1/images/generations');
 
@@ -78,8 +109,8 @@ class _InputScreenState extends State<InputScreen> {
     final double dailyTimeLimit = prefs.getDouble('dailyTimeLimit') ?? 1.0;
     final double difficultyLevel = prefs.getDouble('difficultyLevel') ?? 1.0;
 
-    final String storyPrompt = "Generate a detailed story suitable for children aged $ageRestriction+ "
-        "about ${_storyPromptController.text}. Include genres such as ${selectedGenres.join(', ')}, "
+    final String fullStoryPrompt = "Generate a detailed story suitable for children aged $ageRestriction+ "
+        "about $storyPrompt. Include genres such as ${selectedGenres.join(', ')}, "
         "with a word limit of $wordLimit, in languages like ${allowedLanguages.join(', ')}. "
         "Exclude custom keywords: $customKeywords. The content should fit within a daily reading time of $dailyTimeLimit hours "
         "and be at a difficulty level of $difficultyLevel.";
@@ -93,7 +124,7 @@ class _InputScreenState extends State<InputScreen> {
         },
         body: jsonEncode({
           'model': 'gpt-3.5-turbo-instruct',
-          'prompt': storyPrompt,
+          'prompt': fullStoryPrompt,
           'max_tokens': 800,
           'temperature': 0.7,
         }),
@@ -104,7 +135,7 @@ class _InputScreenState extends State<InputScreen> {
         final fullStory = data['choices'][0]['text'].trim();
         List<String> paragraphs = _splitIntoParagraphs(fullStory, 4);
 
-        _imagesURLs.clear(); // Clear existing URLs
+        _imagesPaths.clear(); // Clear existing paths
 
         for (String paragraph in paragraphs) {
           final imageResponse = await http.post(
@@ -114,8 +145,8 @@ class _InputScreenState extends State<InputScreen> {
               'Authorization': 'Bearer $apiKey',
             },
             body: jsonEncode({
-              'model': 'dall-e-2',  // Use DALL-E 2 for image generation
-              'prompt': "generate an animated-style image for " + _storyPromptController.text + " and do not include any text in the pictures they should be clear ",
+              'model': 'dall-e-2',  // Use DALL-E 3 for image generation
+              'prompt': "generate an animated-style image for " + storyPrompt + " and do not include any text in the pictures they should be clear ",
               'n': 1,
               'size': '1024x1024'
             }),
@@ -123,9 +154,14 @@ class _InputScreenState extends State<InputScreen> {
 
           if (imageResponse.statusCode == 200) {
             final imageData = json.decode(imageResponse.body);
-            _imagesURLs.add(imageData['data'][0]['url']);
+            String imageUrl = imageData['data'][0]['url'];
+            File imageFile = await _downloadAndSaveImage(imageUrl, 'image_${Uuid().v4()}.png');
+            _imagesPaths.add(imageFile.path);
           }
         }
+
+        // Save search text to history
+        await _saveSearchHistory(storyPrompt);
 
         Navigator.push(
           context,
@@ -133,8 +169,8 @@ class _InputScreenState extends State<InputScreen> {
             builder: (context) => GeneratedStoryScreen(
               initialStoryText: fullStory,
               initialChoices: ['Restart', 'New Story'],
-              imagesURLs: _imagesURLs,
-              storyTitle: _storyPromptController.text, // Pass the story title
+              imagePaths: _imagesPaths,
+              storyTitle: storyPrompt, // Pass the story title
             ),
           ),
         );
@@ -147,6 +183,15 @@ class _InputScreenState extends State<InputScreen> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  Future<File> _downloadAndSaveImage(String url, String filename) async {
+    var response = await http.get(Uri.parse(url));
+    Directory directory = await getApplicationDocumentsDirectory();
+    String filePath = path.join(directory.path, filename);
+    File file = File(filePath);
+    await file.writeAsBytes(response.bodyBytes);
+    return file;
   }
 
   List<String> _splitIntoParagraphs(String text, int count) {
@@ -218,19 +263,29 @@ class _InputScreenState extends State<InputScreen> {
             SizedBox(height: 30),
             ElevatedButton(
               onPressed: _isLoading ? null : _generateContent,
-              child: Text(
+              child: _isLoading ? CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ) : Text(
                 'Generate Story',
                 style: TextStyle(fontSize: 18),
               ),
               style: ElevatedButton.styleFrom(
-                primary: Colors.deepPurple,
-                onPrimary: Colors.white,
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
             ),
+            if (_isLoading) // Show loading message when content is being generated
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  'Generating story, please wait...',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ),
           ],
         ),
       ),

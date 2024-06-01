@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'DatabaseHelper.dart'; // Ensure you have this import for the DatabaseHelper
+import 'dart:io';
+import 'DatabaseHelper.dart';
 
 class GeneratedStoryScreen extends StatefulWidget {
   final String initialStoryText;
   final List<String> initialChoices;
-  final List<String> imagesURLs;  // List of URLs for images
+  final List<String> imagePaths;  // List of paths for images
   final String storyTitle;  // Title of the story
 
   GeneratedStoryScreen({
     Key? key,
     required this.initialStoryText,
     required this.initialChoices,
-    required this.imagesURLs,
+    required this.imagePaths,
     required this.storyTitle,
   }) : super(key: key);
 
@@ -60,7 +61,7 @@ class _GeneratedStoryScreenState extends State<GeneratedStoryScreen> {
   }
 
   Future<void> _saveStory() async {
-    int id = await DatabaseHelper().saveStory(widget.storyTitle, widget.initialStoryText, widget.imagesURLs);
+    int id = await DatabaseHelper().saveStory(widget.storyTitle, widget.initialStoryText, widget.imagePaths);
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(id != 0 ? 'Story saved successfully' : 'Failed to save the story'))
     );
@@ -78,12 +79,6 @@ class _GeneratedStoryScreenState extends State<GeneratedStoryScreen> {
       appBar: AppBar(
         title: Text(widget.storyTitle),  // Use the story title
         backgroundColor: Colors.purple[400],
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.download),
-            onPressed: _saveStory,
-          )
-        ],
       ),
       body: Column(
         children: [
@@ -100,9 +95,12 @@ class _GeneratedStoryScreenState extends State<GeneratedStoryScreen> {
                 autoPlayAnimationDuration: Duration(milliseconds: 800),
                 autoPlayInterval: Duration(seconds: 3),
               ),
-              items: widget.imagesURLs.map((item) => Center(
-                  child: Image.network(item, fit: BoxFit.cover, width: MediaQuery.of(context).size.width)
-              )).toList(),
+              items: widget.imagePaths.map((item) => Center(
+                  child: Image.file(File(item), fit: BoxFit.cover, width: MediaQuery.of(context).size.width,
+                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                      return Text('Failed to load image');
+                    },
+                  ))).toList(),
             ),
           ),
           Expanded(
@@ -127,15 +125,27 @@ class _GeneratedStoryScreenState extends State<GeneratedStoryScreen> {
           Padding(
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 ElevatedButton.icon(
                   icon: Icon(isPlaying ? Icons.stop : Icons.play_arrow, size: 24),
                   label: Text(isPlaying ? 'Stop' : 'Play'),
                   onPressed: _speak,
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.pinkAccent[400],
-                    onPrimary: Colors.white,
+                    backgroundColor: Colors.green,  // Previously 'primary'
+                    foregroundColor: Colors.white,  // Previously 'onPrimary'
+                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.download, size: 24),
+                  label: Text('Download'),
+                  onPressed: _saveStory,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,  // Previously 'primary'
+                    foregroundColor: Colors.white,  // Previously 'onPrimary'
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
