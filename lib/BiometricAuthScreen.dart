@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ParentalControlScreen.dart';  // Ensure this import matches the location of your ParentalControlScreen
 
 class BiometricAuthScreen extends StatefulWidget {
@@ -8,39 +9,48 @@ class BiometricAuthScreen extends StatefulWidget {
 }
 
 class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
-  final LocalAuthentication auth = LocalAuthentication();
-  String _authorized = 'Not Authorized';
-  bool _isAuthenticating = false;
+  bool _biometricEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricPreference();
+  }
+
+  Future<void> _loadBiometricPreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _biometricEnabled = prefs.getBool('biometricEnabled') ?? false;
+    });
+  }
+
+  Future<void> _saveBiometricPreference(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('biometricEnabled', value);
+    setState(() {
+      _biometricEnabled = value;
+    });
+    if (value) {
+      _authenticate();
+    }
+  }
 
   Future<void> _authenticate() async {
+    final LocalAuthentication auth = LocalAuthentication();
     bool authenticated = false;
     try {
-      setState(() {
-        _isAuthenticating = true;
-        _authorized = 'Authenticating';
-      });
       authenticated = await auth.authenticate(
         localizedReason: 'Scan your fingerprint to authenticate',
         options: const AuthenticationOptions(biometricOnly: true),
       );
       if (authenticated) {
-        Navigator.of(context).push(MaterialPageRoute(
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => ParentalControlScreen(),  // Direct to Parental Control Screen upon success
         ));
       }
-      setState(() {
-        _authorized = authenticated ? 'Authorized' : 'Not Authorized';
-      });
     } catch (e) {
       print('Error using biometric authentication: $e');
-      setState(() {
-        _authorized = "Failed to authenticate: $e";
-      });
       _showErrorDialog(e.toString());
-    } finally {
-      setState(() {
-        _isAuthenticating = false;
-      });
     }
   }
 
@@ -70,10 +80,42 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Authentication status: $_authorized'),
-            ElevatedButton(
-              onPressed: _isAuthenticating ? null : _authenticate,
-              child: Text(_isAuthenticating ? 'Authenticating...' : 'Authenticate'),
+            SwitchListTile(
+              title: Text('Enable Biometric Authentication for Parental Control'),
+              value: _biometricEnabled,
+              onChanged: (bool value) {
+                _saveBiometricPreference(value);
+              },
+              activeColor: Colors.indigo,
+              inactiveThumbColor: Colors.grey,
+              inactiveTrackColor: Colors.grey.shade300,
+            ),
+            AnimatedContainer(
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: _biometricEnabled ? Colors.indigo.shade50 : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    _biometricEnabled ? Icons.fingerprint : Icons.fingerprint_outlined,
+                    color: _biometricEnabled ? Colors.indigo : Colors.grey,
+                    size: 48,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    _biometricEnabled ? 'Biometric Authentication Enabled' : 'Biometric Authentication Disabled',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: _biometricEnabled ? Colors.indigo : Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

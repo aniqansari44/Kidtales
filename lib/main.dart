@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(onLoginSuccess: () => Navigator.of(context).pushReplacementNamed('/home')),
         '/signup': (context) => SignupPage(),
         '/settings': (context) => SettingsScreen(),
-        '/setupPassword': (context) => SetupPasswordScreen(),
+        '/setupPassword': (context) => SetupPasswordScreen(initialPassword: '',),
         '/feedback': (context) => FeedbackScreen(),
       },
     );

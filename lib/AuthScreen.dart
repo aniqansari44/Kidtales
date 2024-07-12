@@ -1,16 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ParentalControlScreen.dart';
 import 'BiometricConfirmationScreen.dart'; // Screen for confirming biometric auth
 import 'PasswordConfirmationScreen.dart'; // Screen for confirming password auth
 
-class AuthScreen extends StatelessWidget {
-  void _authenticate(BuildContext context, String method) async {
+class AuthScreen extends StatefulWidget {
+  @override
+  _AuthScreenState createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  bool _biometricEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricPreference();
+  }
+
+  Future<void> _loadBiometricPreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _biometricEnabled = prefs.getBool('biometricEnabled') ?? false;
+    });
+  }
+
+  Future<void> _authenticate(BuildContext context, String method) async {
     bool authenticated = false;
     if (method == 'biometric') {
-      // Navigate to Biometric Confirmation Screen
-      authenticated = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => BiometricConfirmationScreen(),
-      ));
+      if (_biometricEnabled) {
+        // Navigate to Biometric Confirmation Screen
+        authenticated = await Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => BiometricConfirmationScreen(),
+        ));
+      } else {
+        authenticated = true;
+      }
     } else if (method == 'password') {
       // Navigate to Password Confirmation Screen
       authenticated = await Navigator.of(context).push(MaterialPageRoute(
@@ -42,9 +67,9 @@ class AuthScreen extends StatelessWidget {
               child: ElevatedButton.icon(
                 icon: Icon(Icons.fingerprint, size: 28),
                 label: Text("Biometric Authentication", style: TextStyle(fontSize: 16)),
-                onPressed: () => _authenticate(context, 'biometric'),
+                onPressed: _biometricEnabled ? () => _authenticate(context, 'biometric') : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,  // Previously 'primary'
+                  backgroundColor: _biometricEnabled ? Colors.indigo : Colors.grey,  // Change color based on enabled state
                   foregroundColor: Colors.white,  // Previously 'onPrimary'
                   padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                   shape: RoundedRectangleBorder(

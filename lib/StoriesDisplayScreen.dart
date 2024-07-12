@@ -72,33 +72,55 @@ class _StoriesDisplayScreenState extends State<StoriesDisplayScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stories in ${widget.genre}'),
+        title: Text('Stories in ${widget.genre}', style: TextStyle(fontFamily: 'ComicSans', fontSize: 24, color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: Colors.purple[400],
       ),
       body: ListView.builder(
         itemCount: _stories.length,
         itemBuilder: (context, index) {
           var story = _stories[index];
           String storyId = '${story['Name']}-${index}';
-          return ListTile(
-            title: Text(story['Name']),
-            subtitle: Text('Age: ${story['Age']} - Genre: ${story['Genre']}'),
-            trailing: Wrap(
-              spacing: 12, // space between two icons
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(currentPlayingStory == storyId && isPlaying ? Icons.stop : Icons.play_arrow),
-                  onPressed: () => _speak(story['Story'], storyId),
-                ),
-                IconButton(
-                  icon: Icon(Icons.info_outline),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => StoryDetailScreen(story: story),
+          return Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            elevation: 5,
+            margin: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            child: ListTile(
+              contentPadding: EdgeInsets.all(10),
+              title: Text(
+                story['Name'],
+                style: TextStyle(fontFamily: 'ComicSans', fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                'Age: ${story['Age']} - Genre: ${story['Genre']}',
+                style: TextStyle(fontFamily: 'ComicSans', fontSize: 16),
+              ),
+              trailing: Wrap(
+                spacing: 12, // space between two icons
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(
+                      currentPlayingStory == storyId && isPlaying ? Icons.stop : Icons.play_arrow,
+                      color: Colors.purple[400],
+                    ),
+                    onPressed: () => _speak(story['Story'], storyId),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.info_outline,
+                      color: Colors.purple[400],
+                    ),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StoryDetailScreen(story: story),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },

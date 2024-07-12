@@ -34,8 +34,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('KidTales'),
+        title: Text('KidTales', style: TextStyle(fontFamily: 'ComicSans', fontSize: 24, color: Colors.black)),
         centerTitle: true,
+        backgroundColor: Colors.purple[400],
       ),
       body: PageView(
         controller: _pageController,
@@ -44,12 +45,12 @@ class _HomePageState extends State<HomePage> {
           SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                Image.asset('assets/images/logo.png'), // Replace with your logo asset
+                Image.asset('assets/images/home.png'), // Replace with your logo asset
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     'Categories',
-                    style: Theme.of(context).textTheme.headline6,
+                    style: TextStyle(fontFamily: 'ComicSans', fontSize: 22, fontWeight: FontWeight.bold, color: Colors.purple[400]),
                   ),
                 ),
                 GridView.count(
@@ -66,12 +67,10 @@ class _HomePageState extends State<HomePage> {
                       imagePath: 'assets/images/history.png', // Replace with your asset
                       label: 'View Listened Stories',
                     ),
-
                     CategoryCard(
                       imagePath: 'assets/images/listen.png', // Replace with your asset
                       label: 'Listen to Stories',
                     ),
-
                     // Add more categories as needed
                   ],
                 ),
@@ -100,7 +99,9 @@ class _HomePageState extends State<HomePage> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.black,
         onTap: _onItemTapped,
+        backgroundColor: Colors.purple[200],
       ),
     );
   }
@@ -116,6 +117,10 @@ class CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      elevation: 5,
       child: InkWell(
         onTap: () {
           // Check the label and navigate accordingly
@@ -135,7 +140,7 @@ class CategoryCard extends StatelessWidget {
             case 'Listen to Stories':
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => SaveStoryScreen()), // Make sure InputScreen is defined
+                MaterialPageRoute(builder: (context) => SaveStoryScreen()), // Make sure SaveStoryScreen is defined
               );
               break;
           // Add more cases as needed for other categories
@@ -147,7 +152,7 @@ class CategoryCard extends StatelessWidget {
             color: Colors.black.withOpacity(0.5),
             child: Text(
               label,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'ComicSans'),
               textAlign: TextAlign.center,
             ),
           ),

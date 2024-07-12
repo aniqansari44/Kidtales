@@ -18,26 +18,19 @@ class SearchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(),
-        title: Text('Search'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: StorySearchDelegate(),
-              );
-            },
-          ),
-        ],
+        title: Text(
+          'Explore Genres',
+          style: TextStyle(fontFamily: 'ComicSans', fontSize: 24, color: Colors.black),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.purple[400],
       ),
       body: GridView.builder(
-        padding: EdgeInsets.all(8.0),
+        padding: EdgeInsets.all(16.0),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 8.0,
-          mainAxisSpacing: 8.0,
+          crossAxisSpacing: 16.0,
+          mainAxisSpacing: 16.0,
           childAspectRatio: 1.0,
         ),
         itemCount: genres.length,
@@ -75,90 +68,36 @@ class GenreButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.0),
-          image: DecorationImage(
-            image: AssetImage(image),
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      elevation: 5,
+      child: InkWell(
+        onTap: onTap,
+        child: GridTile(
+          footer: Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.5),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(8.0),
+                bottomRight: Radius.circular(8.0),
+              ),
+            ),
+            child: Text(
+              genre,
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'ComicSans', fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          child: Image.asset(
+            image,
             fit: BoxFit.cover,
           ),
         ),
-        alignment: Alignment.bottomCenter,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(8.0),
-              bottomRight: Radius.circular(8.0),
-            ),
-          ),
-          child: Text(
-            genre,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ),
       ),
-    );
-  }
-}
-
-class StorySearchDelegate extends SearchDelegate<String> {
-  @override
-  List<Widget> buildActions(BuildContext context) {
-    // Actions for the AppBar
-    return [
-      IconButton(
-        icon: Icon(Icons.clear),
-        onPressed: () {
-          query = '';
-          showSuggestions(context);
-        },
-      ),
-    ];
-  }
-
-  @override
-  Widget buildLeading(BuildContext context) {
-    // Leading icon on the left of the AppBar
-    return BackButton();
-  }
-
-  @override
-  Widget buildResults(BuildContext context) {
-    // Show some result based on the selection
-    return StoriesDisplayScreen(genre: query);
-  }
-
-  @override
-  Widget buildSuggestions(BuildContext context) {
-    // Show when someone searches for something
-    // Placeholder for suggestions, you can implement actual search suggestions here
-    return ListView(
-      children: query.isEmpty
-          ? []
-          : ListTile.divideTiles(
-        context: context,
-        tiles: [
-          ListTile(
-            title: Text('Suggestion 1 for "$query"'),
-            onTap: () {
-              query = 'Suggestion 1 for "$query"';
-              showResults(context);
-            },
-          ),
-          ListTile(
-            title: Text('Suggestion 2 for "$query"'),
-            onTap: () {
-              query = 'Suggestion 2 for "$query"';
-              showResults(context);
-            },
-          ),
-          // Add more suggestions here
-        ],
-      ).toList(),
     );
   }
 }

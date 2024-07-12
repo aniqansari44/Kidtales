@@ -60,11 +60,41 @@ class _GeneratedStoryScreenState extends State<GeneratedStoryScreen> {
     }
   }
 
-  Future<void> _saveStory() async {
-    int id = await DatabaseHelper().saveStory(widget.storyTitle, widget.initialStoryText, widget.imagePaths);
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(id != 0 ? 'Story saved successfully' : 'Failed to save the story'))
+  Future<void> _showInteractiveMessage(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,  // user must tap button to dismiss the message
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Notification'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  Future<void> _saveStory() async {
+    bool storyExists = await DatabaseHelper().storyExists(widget.storyTitle, widget.initialStoryText);
+    if (storyExists) {
+      _showInteractiveMessage('Story already saved');
+    } else {
+      int id = await DatabaseHelper().saveStory(widget.storyTitle, widget.initialStoryText, widget.imagePaths);
+      _showInteractiveMessage(id != 0 ? 'Story saved successfully' : 'Failed to save the story');
+    }
   }
 
   @override

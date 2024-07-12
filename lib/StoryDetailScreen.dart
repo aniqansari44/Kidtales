@@ -67,50 +67,62 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
     ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.story['Name'], style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(
+          widget.story['Name'],
+          style: TextStyle(fontFamily: 'ComicSans', fontSize: 24, color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.purple[400],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.story['Story'],
-                style: TextStyle(fontSize: 18.0, height: 1.5),
-              ),
-              SizedBox(height: 20),
-              // Display additional story details (e.g., hero and villain names) if needed here
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ElevatedButton.icon(
-                    icon: Icon(isPlaying ? Icons.stop : Icons.play_arrow),
-                    label: Text(isPlaying ? 'Stop' : 'Play'),
-                    onPressed: _speak,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isPlaying ? Colors.redAccent : theme.primaryColor,  // Changed from 'primary'
-                      foregroundColor: Colors.black,  // Changed from 'onPrimary'
-                      textStyle: TextStyle(fontWeight: FontWeight.bold),
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    ),
-                  ),
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.pause),
-                    label: Text('Pause'),
-                    onPressed: isPlaying ? _pause : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,  // Changed from 'primary'
-                      foregroundColor: Colors.white,  // Changed from 'onPrimary'
-                      textStyle: TextStyle(fontWeight: FontWeight.bold),
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    ),
+                  Text(
+                    widget.story['Story'],
+                    style: TextStyle(fontFamily: 'ComicSans', fontSize: 18, height: 1.5),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            bottom: 30,
+            left: 20,
+            right: 20,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  icon: Icon(isPlaying ? Icons.stop : Icons.play_arrow),
+                  label: Text(isPlaying ? 'Stop' : 'Play'),
+                  onPressed: _speak,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isPlaying ? Colors.redAccent : theme.primaryColor,
+                    foregroundColor: Colors.white,
+                    textStyle: TextStyle(fontFamily: 'ComicSans', fontWeight: FontWeight.bold),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.pause),
+                  label: Text('Pause'),
+                  onPressed: isPlaying ? _pause : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                    textStyle: TextStyle(fontFamily: 'ComicSans', fontWeight: FontWeight.bold),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

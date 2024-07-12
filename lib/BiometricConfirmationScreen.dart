@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'ParentalControlScreen.dart';  // Ensure this import matches the location of your ParentalControlScreen
 
 class BiometricConfirmationScreen extends StatefulWidget {
   @override
@@ -11,29 +12,40 @@ class _BiometricConfirmationScreenState extends State<BiometricConfirmationScree
   String _authorized = 'Not Authorized';
   bool _isAuthenticating = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _authenticate();
+  }
+
   Future<void> _authenticate() async {
     bool authenticated = false;
     try {
       setState(() {
         _isAuthenticating = true;
-        _authorized = 'Authenticating...';
+        _authorized = 'Authenticating';
       });
       authenticated = await auth.authenticate(
-        localizedReason: 'Please authenticate to access parental controls',
-        options: const AuthenticationOptions(biometricOnly: true), // Ensure only biometric auth is used
+        localizedReason: 'Scan your fingerprint to authenticate',
+        options: const AuthenticationOptions(biometricOnly: true),
       );
       if (authenticated) {
-        Navigator.of(context).pop(true); // Return true if authentication is successful
-      } else {
-        _showErrorDialog("Authentication failed");
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => ParentalControlScreen(),  // Direct to Parental Control Screen upon success
+        ));
       }
+      setState(() {
+        _authorized = authenticated ? 'Authorized' : 'Not Authorized';
+      });
     } catch (e) {
       print('Error using biometric authentication: $e');
-      _showErrorDialog("Authentication Error: $e");
+      setState(() {
+        _authorized = "Failed to authenticate: $e";
+      });
+      _showErrorDialog(e.toString());
     } finally {
       setState(() {
         _isAuthenticating = false;
-        _authorized = authenticated ? 'Authorized' : 'Not Authorized';
       });
     }
   }
@@ -46,9 +58,7 @@ class _BiometricConfirmationScreenState extends State<BiometricConfirmationScree
         content: Text(message),
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            onPressed: () => Navigator.of(context).pop(),
             child: Text('OK'),
           ),
         ],
@@ -58,36 +68,17 @@ class _BiometricConfirmationScreenState extends State<BiometricConfirmationScree
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Biometric Authentication'),
       ),
       body: Center(
-        child: Column(
+        child: _isAuthenticating
+            ? CircularProgressIndicator()
+            : Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            AnimatedSwitcher(
-              duration: Duration(milliseconds: 500),
-              child: Text(
-                _authorized,
-                key: ValueKey<String>(_authorized),
-                style: TextStyle(fontSize: 24, color: theme.colorScheme.secondary),
-              ),
-            ),
-            SizedBox(height: 40),
-            ElevatedButton.icon(
-              icon: _isAuthenticating ? CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)) : Icon(Icons.fingerprint),
-              label: Text(_isAuthenticating ? 'Authenticating...' : 'Authenticate'),
-              onPressed: _isAuthenticating ? null : _authenticate,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.primaryColor,  // Changed from 'primary'
-                foregroundColor: Colors.white,  // Changed from 'onPrimary'
-                textStyle: TextStyle(fontSize: 18),
-                padding: EdgeInsets.symmetric(horizontal: 32, vertical: 20),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              ),
-            ),
+            Text('Authentication status: $_authorized'),
           ],
         ),
       ),

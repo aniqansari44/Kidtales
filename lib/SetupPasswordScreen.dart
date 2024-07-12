@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'HomePage.dart';  // Import the home page
 
 class SetupPasswordScreen extends StatefulWidget {
+  final String initialPassword;
+
+  SetupPasswordScreen({required this.initialPassword});
+
   @override
   _SetupPasswordScreenState createState() => _SetupPasswordScreenState();
 }
@@ -14,6 +19,12 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
   final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   bool _obscureText = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPasswordController.text = widget.initialPassword;
+  }
 
   void _togglePasswordVisibility() {
     setState(() {
@@ -28,8 +39,18 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
       if (storedPassword != null && storedPassword == _currentPasswordController.text) {
         // Set new password if current password is validated
         await _secureStorage.write(key: 'user_password', value: _newPasswordController.text);
+
+        // Set the flag to indicate password setup is done
+        await _secureStorage.write(key: 'is_password_setup_done', value: 'true');
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Password updated successfully')),
+        );
+
+        // Navigate to the home page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),  // Assuming HomePage is your home screen widget
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -51,7 +72,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Set Up Password'),
+        title: Text('Parental Control Password'),
         backgroundColor: Colors.deepPurple,
       ),
       body: SingleChildScrollView(
@@ -118,7 +139,7 @@ class _SetupPasswordScreenState extends State<SetupPasswordScreen> {
                 child: Text('Update Password'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,  // Previously 'primary'
-                  foregroundColor: Colors.white,  // Previously 'onPrimary
+                  foregroundColor: Colors.white,  // Previously 'onPrimary'
                   padding: EdgeInsets.symmetric(vertical: 12),
                   textStyle: TextStyle(fontSize: 18),
                 ),

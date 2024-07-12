@@ -22,14 +22,37 @@ class _SaveStoryScreenState extends State<SaveStoryScreen> {
     });
   }
 
+  Future<void> _showInteractiveMessage(String message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,  // user must tap button to dismiss the message
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Notification'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> deleteStory(int id) async {
     await DatabaseHelper().deleteStory(id);
     refreshStories(); // Refresh the list after deletion
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Story deleted successfully'),
-      backgroundColor: Colors.red,
-      duration: Duration(seconds: 2),
-    ));
+    _showInteractiveMessage('Story deleted successfully');
   }
 
   @override
@@ -37,7 +60,7 @@ class _SaveStoryScreenState extends State<SaveStoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Saved Stories'),
-        backgroundColor: Colors.deepPurple, // Adding a more engaging color
+        backgroundColor: Colors.purple[400], // Adding a more engaging color
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: savedStories,
@@ -51,11 +74,14 @@ class _SaveStoryScreenState extends State<SaveStoryScreen> {
                   var story = snapshot.data![index];
                   List<String> imagePaths = story['imagePaths'].split(',');
                   return ListTile(
-                    leading: Icon(Icons.book, color: Colors.deepPurple), // Visually distinct icon
-                    title: Text(story['title'], style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('Tap to read the story', style: TextStyle(fontSize: 12)),
+                    leading: Icon(Icons.book, color: Colors.purple[400], size: 36), // Visually distinct icon
+                    title: Text(
+                      story['title'],
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.deepPurple),
+                    ),
+                    subtitle: Text('Tap to read the story', style: TextStyle(fontSize: 14, color: Colors.grey)),
                     trailing: IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(Icons.delete, color: Colors.red, size: 30),
                       onPressed: () => deleteStory(story['id']),
                     ),
                     onTap: () {
@@ -82,6 +108,13 @@ class _SaveStoryScreenState extends State<SaveStoryScreen> {
             return Center(child: Text('Failed to load stories: ${snapshot.error}', style: TextStyle(color: Colors.red)));
           }
           return Center(child: CircularProgressIndicator());
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.purple[400],
+        child: Icon(Icons.add, color: Colors.white, size: 36),
+        onPressed: () {
+          // Action for adding a new story
         },
       ),
     );

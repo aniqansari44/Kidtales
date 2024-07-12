@@ -111,7 +111,7 @@ class _InputScreenState extends State<InputScreen> {
 
     final String fullStoryPrompt = "Generate a detailed story suitable for children aged $ageRestriction+ "
         "about $storyPrompt. Include genres such as ${selectedGenres.join(', ')}, "
-        "with a word limit of $wordLimit, in languages like ${allowedLanguages.join(', ')}. "
+        "with a word limit of $wordLimit, in language $_selectedLanguage "
         "Exclude custom keywords: $customKeywords. The content should fit within a daily reading time of $dailyTimeLimit hours "
         "and be at a difficulty level of $difficultyLevel.";
 
@@ -145,7 +145,7 @@ class _InputScreenState extends State<InputScreen> {
               'Authorization': 'Bearer $apiKey',
             },
             body: jsonEncode({
-              'model': 'dall-e-2',  // Use DALL-E 3 for image generation
+              'model': 'dall-e-3',  // Use DALL-E 3 for image generation
               'prompt': "generate an animated-style image for " + storyPrompt + " and do not include any text in the pictures they should be clear ",
               'n': 1,
               'size': '1024x1024'
@@ -203,7 +203,8 @@ class _InputScreenState extends State<InputScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Generate Story and Images'),
+        title: Text('Generate Story and Images', style: TextStyle(fontFamily: 'ComicSans', fontSize: 24)),
+        backgroundColor: Colors.purple[400],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -213,14 +214,19 @@ class _InputScreenState extends State<InputScreen> {
               controller: _storyPromptController,
               decoration: InputDecoration(
                 labelText: 'Story Prompt',
+                labelStyle: TextStyle(fontFamily: 'ComicSans', fontSize: 18, color: Colors.blue),
                 hintText: 'What is your story about?',
-                border: OutlineInputBorder(),
+                hintStyle: TextStyle(fontFamily: 'ComicSans', fontSize: 16, color: Colors.grey),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 suffixIcon: IconButton(
-                  icon: Icon(_isListening ? Icons.mic_off : Icons.mic),
+                  icon: Icon(_isListening ? Icons.mic_off : Icons.mic, color: Colors.blue),
                   onPressed: _listen,
                 ),
               ),
               maxLines: null,
+              style: TextStyle(fontFamily: 'ComicSans', fontSize: 16, color: Colors.black),
             ),
             SizedBox(height: 20),
             DropdownButtonFormField<String>(
@@ -228,12 +234,15 @@ class _InputScreenState extends State<InputScreen> {
               items: _availableGenres.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(value, style: TextStyle(fontFamily: 'ComicSans', fontSize: 16)),
                 );
               }).toList(),
               decoration: InputDecoration(
                 labelText: 'Genre',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(fontFamily: 'ComicSans', fontSize: 18, color: Colors.blue),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
               onChanged: (String? newValue) {
                 if (newValue != null) {
@@ -247,12 +256,15 @@ class _InputScreenState extends State<InputScreen> {
               items: _availableLanguages.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(value, style: TextStyle(fontFamily: 'ComicSans', fontSize: 16)),
                 );
               }).toList(),
               decoration: InputDecoration(
                 labelText: 'Language',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(fontFamily: 'ComicSans', fontSize: 18, color: Colors.blue),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
               ),
               onChanged: (String? newValue) {
                 if (newValue != null) {
@@ -267,14 +279,14 @@ class _InputScreenState extends State<InputScreen> {
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ) : Text(
                 'Generate Story',
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 18, fontFamily: 'ComicSans'),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: Colors.purple[400],
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
             ),
@@ -283,7 +295,7 @@ class _InputScreenState extends State<InputScreen> {
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Text(
                   'Generating story, please wait...',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: Colors.grey, fontFamily: 'ComicSans'),
                 ),
               ),
           ],
@@ -291,7 +303,8 @@ class _InputScreenState extends State<InputScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _listen,
-        child: Icon(_isListening ? Icons.mic_off : Icons.mic),
+        backgroundColor: Colors.blueAccent,
+        child: Icon(_isListening ? Icons.mic_off : Icons.mic, color: Colors.white),
       ),
     );
   }

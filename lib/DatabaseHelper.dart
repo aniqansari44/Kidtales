@@ -42,4 +42,14 @@ class DatabaseHelper {
     final db = await database;
     return await db.query('Stories');
   }
+
+  Future<bool> storyExists(String title, String storyText) async {
+    final db = await database;
+    var res = await db.query(
+      'Stories',
+      where: 'title = ? AND storyText = ?',
+      whereArgs: [title, storyText],
+    );
+    return res.isNotEmpty;
+  }
 }

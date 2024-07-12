@@ -13,17 +13,22 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text(
+          'Settings',
+          style: TextStyle(fontFamily: 'ComicSans', fontSize: 24, color: Colors.black),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.purple[400],
       ),
       body: ListView(
         children: ListTile.divideTiles(
           context: context,
           tiles: [
             ListTile(
-              leading: Icon(Icons.security),
-              title: Text('Parental Controls'),
-              subtitle: Text('Secure access to parental controls'),
-              trailing: Icon(Icons.chevron_right),
+              leading: Icon(Icons.security, color: Colors.purple[400], size: 30),
+              title: Text('Parental Controls', style: TextStyle(fontFamily: 'ComicSans', fontSize: 18)),
+              subtitle: Text('Secure access to parental controls', style: TextStyle(fontFamily: 'ComicSans', fontSize: 14)),
+              trailing: Icon(Icons.chevron_right, color: Colors.purple[400]),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => AuthScreen(),
@@ -31,45 +36,38 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.vpn_key),
-              title: Text('Set Password'),
-              trailing: Icon(Icons.chevron_right),
+              leading: Icon(Icons.vpn_key, color: Colors.purple[400], size: 30),
+              title: Text('Set Password', style: TextStyle(fontFamily: 'ComicSans', fontSize: 18)),
+              trailing: Icon(Icons.chevron_right, color: Colors.purple[400]),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => SetupPasswordScreen(),
+                  builder: (context) => SetupPasswordScreen(initialPassword: '',),
                 ));
               },
             ),
             ListTile(
-              leading: Icon(Icons.fingerprint),
-              title: Text('Biometric Authentication'),
-              trailing: Icon(Icons.chevron_right),
+              leading: Icon(Icons.fingerprint, color: Colors.purple[400], size: 30),
+              title: Text('Biometric Authentication', style: TextStyle(fontFamily: 'ComicSans', fontSize: 18)),
+              trailing: Icon(Icons.chevron_right, color: Colors.purple[400]),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => BiometricAuthScreen(),
                 ));
               },
             ),
+
             ListTile(
-              leading: Icon(Icons.language),
-              title: Text('Language'),
-              trailing: Icon(Icons.chevron_right),
-              onTap: () {
-                // Placeholder for language settings
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.notifications),
-              title: Text('Notifications'),
-              trailing: Icon(Icons.chevron_right),
+              leading: Icon(Icons.notifications, color: Colors.purple[400], size: 30),
+              title: Text('Notifications', style: TextStyle(fontFamily: 'ComicSans', fontSize: 18)),
+              trailing: Icon(Icons.chevron_right, color: Colors.purple[400]),
               onTap: () {
                 // Placeholder for notification settings
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Feedback'),
-              trailing: Icon(Icons.chevron_right),
+              leading: Icon(Icons.feedback, color: Colors.purple[400], size: 30),
+              title: Text('Feedback', style: TextStyle(fontFamily: 'ComicSans', fontSize: 18)),
+              trailing: Icon(Icons.chevron_right, color: Colors.purple[400]),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => FeedbackScreen(),
@@ -77,9 +75,9 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.help_outline),
-              title: Text('Help & Support'),
-              trailing: Icon(Icons.chevron_right),
+              leading: Icon(Icons.help_outline, color: Colors.purple[400], size: 30),
+              title: Text('Help & Support', style: TextStyle(fontFamily: 'ComicSans', fontSize: 18)),
+              trailing: Icon(Icons.chevron_right, color: Colors.purple[400]),
               onTap: () {
                 // Placeholder for help and support
               },
@@ -91,7 +89,7 @@ class SettingsScreen extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.all(16),
         child: ElevatedButton(
-          child: Text('Sign Out'),
+          child: Text('Sign Out', style: TextStyle(fontFamily: 'ComicSans', fontSize: 18)),
           onPressed: () async {
             await _auth.signOut();
             Navigator.pushReplacement(
@@ -102,6 +100,10 @@ class SettingsScreen extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 15),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
           ),
         ),
       ),

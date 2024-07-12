@@ -50,24 +50,30 @@ class _SignupPageState extends State<SignupPage> {
       }
     } catch (e) {
       // Handle any other unexpected errors
-      Fluttertoast.showToast(msg: 'SignUp Successfull.');
+      Fluttertoast.showToast(msg: 'SignUp Successful.');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.yellow[50],
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Create Account', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text('Create Account', style: TextStyle(fontFamily: 'ComicSans', fontSize: 26, fontWeight: FontWeight.bold, color: Colors.purple[400])),
             SizedBox(height: 20),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(
                 labelText: 'Enter your email',
+                labelStyle: TextStyle(fontFamily: 'ComicSans', fontSize: 18, color: Colors.purple[400]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                prefixIcon: Icon(Icons.email, color: Colors.purple[400]),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -77,12 +83,24 @@ class _SignupPageState extends State<SignupPage> {
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Choose a password',
+                labelStyle: TextStyle(fontFamily: 'ComicSans', fontSize: 18, color: Colors.purple[400]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                prefixIcon: Icon(Icons.lock, color: Colors.purple[400]),
               ),
             ),
             SizedBox(height: 40),
             ElevatedButton(
               onPressed: _registerUser,
-              child: Text('Sign Up'),
+              child: Text('Sign Up', style: TextStyle(fontFamily: 'ComicSans', fontSize: 18, color: Colors.black)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple[400],
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
             ),
           ],
         ),

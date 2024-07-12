@@ -63,6 +63,7 @@ dependencies:
 
 
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -79,6 +80,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+
     assets:
       - assets/images/logo.png
       - assets/images/welcome.png
@@ -94,8 +96,13 @@ flutter:
       - assets/images/romance.png
       - assets/images/sci-fi.png
       - assets/images/horror.png
+      - assets/images/home.png
       - assets/fyp_stories.json
       - .env
+    fonts:
+      - family: NotoNaskhArabic
+        fonts:
+          - asset: fonts/NotoNaskhArabic-Regular.ttf
 
 
 
